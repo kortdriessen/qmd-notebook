@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 (2026-10-03)
 
 - Automatically install the user-wide Codex `$focus-notebook` skill on extension activation.
   The setup command installs/refreshes this skill instead of creating a Codex custom prompt.

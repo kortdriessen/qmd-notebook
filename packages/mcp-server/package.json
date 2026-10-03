@@ -1,12 +1,19 @@
 {
   "name": "qmd-notebook-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP companion for the QMD Notebook VS Code extension: lets Claude Code and Codex read, edit and execute live .qmd notebook cells and inspect the live IPython kernel",
   "license": "MIT",
-  "bin": { "qmd-notebook-mcp": "dist/cli.js" },
+  "bin": {
+    "qmd-notebook-mcp": "dist/cli.js"
+  },
   "main": "dist/cli.js",
-  "files": ["dist/cli.js", "README.md"],
-  "engines": { "node": ">=18" },
+  "files": [
+    "dist/cli.js",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "node esbuild.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",

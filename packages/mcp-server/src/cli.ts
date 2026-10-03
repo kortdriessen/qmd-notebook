@@ -14,7 +14,7 @@ import { doctor } from './doctor';
 import { BridgeClient } from './ipcClient';
 import { registerTools, TOOLS } from './tools';
 
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 
 interface Args {
   command: 'serve' | 'doctor' | 'help' | 'version' | 'list-tools';

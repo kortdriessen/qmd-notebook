@@ -1,7 +1,7 @@
 {
   "name": "qmd-notebook-monorepo",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "QMD Notebook for VS Code: open Quarto .qmd files as native Python notebooks with a live agent bridge",
   "license": "MIT",
   "workspaces": [

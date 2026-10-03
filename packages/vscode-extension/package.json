@@ -2,7 +2,7 @@
   "name": "qmd-notebook",
   "displayName": "QMD Notebook",
   "description": "Open Quarto .qmd files as native Python notebooks: Pylance-backed cells, a persistent IPython kernel, lossless .qmd round-trips, and a live agent bridge for Claude Code and Codex.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "kortdriessen",
   "license": "MIT",
   "private": true,
@@ -781,7 +781,7 @@
           {
             "id": "open",
             "title": "Open a .qmd as a notebook",
-            "description": "Right-click a .qmd file \u2192 Open With \u2192 QMD Notebook. Executable ```{python} chunks become code cells; everything else stays Markdown.\n[Open Sample](command:qmdNotebook.openAsNotebook)",
+            "description": "Right-click a .qmd file → Open With → QMD Notebook. Executable ```{python} chunks become code cells; everything else stays Markdown.\n[Open Sample](command:qmdNotebook.openAsNotebook)",
             "media": {
               "markdown": "media/walkthrough-open.md"
             }
