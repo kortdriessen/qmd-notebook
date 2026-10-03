@@ -1,0 +1,7 @@
+---
+title: "CRLF no final"
+---
+
+```{python}
+x = 1
+```

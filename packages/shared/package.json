@@ -1,0 +1,16 @@
+{
+  "name": "@qmd-notebook/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Protocol types, schemas, ids and errors shared by the QMD Notebook extension and MCP companion",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test \"dist/test/*.test.js\""
+  },
+  "dependencies": {
+    "zod": "^4.0.0"
+  }
+}

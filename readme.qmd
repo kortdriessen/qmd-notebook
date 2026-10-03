@@ -1,0 +1,232 @@
+---
+title: "QMD Notebook — setup and workflow"
+format: gfm
+---
+
+QMD Notebook opens a Quarto `.qmd` as a native VS Code notebook (Python cells with Pylance, a
+persistent IPython kernel, inline plots and tables) and lets Claude Code or Codex work on the
+*same live cells and kernel* by watching for comments you add in the notebook. The `.qmd` on disk
+stays clean Quarto Markdown: no outputs, no ids, no agent chatter.
+
+# 1. Setup from scratch
+
+## Prerequisites
+
+- VS Code 1.125 or newer with the **Python** and **Pylance** extensions (the Jupyter extension is
+  not needed).
+- Node 20 or newer, and `node` on your `PATH` (the MCP companion is a Node script).
+- A Python environment for the notebook with `ipykernel` installed (plus whatever you analyse
+  with). For example: `uv venv .venv && uv pip install ipykernel pandas matplotlib`.
+- The agent you want to use, logged in: Claude Code CLI (`claude`) and/or Codex CLI (`codex`).
+  The Claude Code / Codex VS Code extensions are optional (same capabilities, just a sidebar).
+
+## Build and install the extension
+
+```bash
+cd ~/vsCode_notebook_extension
+npm install
+scripts/package-vsix.sh                      # builds everything → qmd-notebook.vsix
+code --install-extension qmd-notebook.vsix   # then reload VS Code
+```
+
+The MCP companion (`qmd-notebook-mcp`) is bundled inside the extension as
+`dist/qmd-notebook-mcp.js`; nothing else to install. Find the installed path with
+`ls ~/.vscode/extensions | grep qmd-notebook` (currently `kortdriessen.qmd-notebook-0.1.0`).
+
+## Connect the agents (once, user level)
+
+Register the companion once at user level, so every Claude Code / Codex session in any project
+has the notebook tools. The companion is launched with `--workspace .`, which resolves to the
+directory you start the agent in: start `claude` in `/data/slap_analysis` and it gets that
+project's `AGENTS.md`/`CLAUDE.md` context *and* connects to the VS Code window that has
+`/data/slap_analysis` (or a folder under it) open. Any notebook in that window can be focused.
+
+1. Open any folder in VS Code and run **QMD Notebook: Configure Claude Code / Codex MCP Access**.
+   Choose **User level** (default). It previews, then:
+   - runs `claude mcp add --scope user qmd-notebook -- …` and `codex mcp add qmd_notebook -- …`
+     (the companion is copied to a stable path in VS Code's global storage, so extension upgrades
+     do not break the registration);
+   - appends the "Live QMD notebooks" rules to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`;
+   - writes Claude's `~/.claude/commands/focus-notebook.md` slash command and installs Codex's
+     `$focus-notebook` skill in `~/.agents/skills/focus-notebook/` (also installed automatically
+     when the extension activates, available across projects on that host).
+2. Restart the agent so it picks up the server. In Claude Code, `/mcp` lists `qmd-notebook`;
+   its tools only work while a `.qmd` is open as a QMD Notebook in a window whose folder matches
+   the agent's directory (otherwise calls return "No QMD Notebook bridge is active for …").
+
+Manual equivalent:
+
+```bash
+EXT=~/.vscode/extensions/kortdriessen.qmd-notebook-0.1.0     # or the globally installed qmd-notebook-mcp
+claude mcp add --scope user qmd-notebook -- node $EXT/dist/qmd-notebook-mcp.js --workspace .
+codex  mcp add qmd_notebook -- node $EXT/dist/qmd-notebook-mcp.js --workspace .
+```
+
+Per-project registration is still available (**This project only** in the configure command:
+`.mcp.json`, `.codex/config.toml`, project `CLAUDE.md`/`AGENTS.md`) for repositories that should
+not see the tools elsewhere. Which window the companion attaches to: the one whose workspace
+folder contains the agent's directory; if you start the agent *above* the folder VS Code has
+open, it attaches only when exactly one window qualifies; several windows → pass
+`--workspace <folder>` or start inside the project.
+
+## Check the connection
+
+- Open a `.qmd` with **Open With → QMD Notebook**, pick a kernel.
+- Run **QMD Notebook: Agent Connection Status** (also in the notebook toolbar): bridge socket,
+  connected clients, whether `.mcp.json` / `.codex/config.toml` mention the server.
+- From a terminal in the project:
+
+```bash
+node ~/.vscode/extensions/kortdriessen.qmd-notebook-0.1.0/dist/qmd-notebook-mcp.js doctor --workspace .
+```
+
+## Optional
+
+- **QMD Notebook: Apply Recommended Appearance Settings** — compact bordered code cells (previewed
+  before anything is written; workspace or user settings).
+- To make QMD Notebook the default editor for `.qmd`, add
+  `"workbench.editorAssociations": { "*.qmd": "qmd-notebook" }` to your settings.
+- If the selected environment lacks `ipykernel`, the first run offers a one-click install.
+
+# 2. Workflow
+
+## Working in the notebook
+
+- Right-click a `.qmd` → **Open With → QMD Notebook**. ```` ```{python} ```` chunks are Python
+  cells; everything else (YAML, prose, callouts, other engines) stays Markdown.
+- Pick a kernel from the toolbar picker (any environment with `ipykernel`; a `jupyter:` front
+  matter hint pre-selects a kernelspec). One persistent kernel per notebook; it survives
+  **Edit in Source** round trips for 10 minutes.
+- Run: `Shift+Enter` runs and advances (stays on a failing cell), `Ctrl+Enter` runs in place,
+  `Alt+Enter` runs and inserts a Python cell. `#| eval: false` cells are skipped unless you use
+  **Force Run Cell**.
+- Move: `Escape` leaves the cell (status bar shows `QMD: NAV`), `Enter` re-enters it. In
+  navigation mode `j`/`k` move, `a`/`b` insert Python cells above/below, `m`/`y` convert to
+  Markdown/Python, `d d` deletes. `Alt+J`/`Alt+K` move from anywhere.
+- **Edit in Source** (`Ctrl+Alt+S`, toolbar) opens the same file as text at the selected cell;
+  **Reopen as Notebook** comes back to the cell under the cursor with the kernel intact.
+- Save writes plain Quarto Markdown with minimal diffs; **Render with Quarto** runs `quarto render`.
+
+## Working with an agent
+
+1. **Focus once.** Start the agent in the project (`claude` or `codex` in a terminal, or the
+   sidebar) and type
+   - Claude Code: `/mcp__qmd-notebook__focus_notebook analysis.qmd` (or `/focus-notebook analysis.qmd`)
+   - Codex: `$focus-notebook analysis.qmd`
+
+   The name is the file name, a path suffix, or the documentId; omit it for the active notebook.
+   The agent registers as the watcher and waits for comments inside one long tool call (hours
+   for Claude Code; Codex gets the same once the configure command has raised its tool
+   timeout); the status bar shows `Claude Code watching` (or Codex). Idle waiting costs no
+   tokens: the call returns the instant a comment arrives. It keeps watching until you say stop,
+   close the notebook, or run **QMD Notebook: Release Watching Agent**. To talk to the agent in
+   its terminal while it waits, press `Escape` first (that cancels the wait).
+2. **Comment in the notebook.** Select text and press `Ctrl+Alt+A`, click the comment icon in a
+   cell's toolbar, or press `Ctrl+Alt+O` for an output (a picker appears when a cell has several).
+   A compose box appears under the cell; type and press **Send** (`Ctrl+Enter`). Paste an image
+   from the clipboard with `Ctrl+V` (a screenshot, a sketch of the plot you want, a figure from
+   a paper); it shows as a thumbnail you can remove, and the small image button attaches a file.
+   The agent receives the exact selection, the cell source, an output preview (plots as images),
+   the neighbouring cells, the kernel state, and the pasted images as real image input.
+3. **Watch the thread.** The thread stays under the cell: `queued for Claude Code` →
+   `working…` (with the agent's one-line plan) → `resolved` (its reply). The comment it receives
+   already contains the cell's current source and hash, the notebook version, your selection or
+   output, the neighbouring cells and a map of the notebook, so a typical comment is two tool
+   calls: one edit-and-run (which also posts the plan), then the resolve. The agent edits cells in
+   place with targeted text edits (exact old/new text, like editing a `.py` file, so a small
+   change never re-sends the whole cell) and per-cell conflict protection (keep editing other cells while it works; only the
+   same cell edited by both of you is a conflict), runs them in your kernel, and the new outputs
+   appear under the same cells. Reply inside the thread for a follow-up; `needs your input` means it asked you
+   something. **Close** ends a comment without the agent; **Ask again** reopens it.
+4. **Indicators.** Each cell's status bar shows `●` per open comment and `○` per resolved one
+   (click to jump to the thread); the **Agent Requests** view (activity bar) lists every thread
+   with *Copy thread as Markdown* / *Insert thread summary into document*. Several comments can be
+   open at once; the agent works through them without blocking on long-running cells.
+5. **Save when happy.** The `.qmd` gets only the cell edits; threads and outputs are never
+   written. Notes: the inline compose box needs a selected kernel (otherwise an input box collects
+   the comment); if no agent is watching when you send, the thread says so and offers a one-line
+   handoff to paste anywhere.
+
+You can also just talk to the agent normally ("look at the active notebook and fix the REM
+filter"): `get_active_context` tells it which notebook, cell and selection you are on, and the
+same tools let it read, edit, run and inspect without you copying anything.
+
+# 3. Cell options (`#|` lines)
+
+Quarto reads options from `#| key: value` lines at the very top of a code cell:
+
+```python
+#| label: fig-stage-time
+#| fig-cap: "Total time per stage per day"
+#| echo: false
+ax = summary.plot(kind="bar")
+```
+
+They are valid Python comments, so the kernel and Pylance ignore them, QMD Notebook keeps them
+verbatim in the cell source, and `quarto render` uses them to decide how the cell appears in the
+rendered document. The block ends at the first line that is not a `#|` line; later `#|` lines are
+ordinary comments. Values are YAML: lowercase booleans (`false`), quote strings that contain
+colons, lists as `[a, b]`.
+
+## What matters interactively
+
+Almost none of them: the notebook always shows the code you wrote and every output you produce.
+The exceptions:
+
+| Option | In QMD Notebook |
+| --- | --- |
+| `eval: false` | **Run**, **Run All** and `Shift+Enter` skip the cell (its status bar shows `eval: false`). **Force Run Cell** (cell toolbar / status item) runs it anyway. Use it for slow or one-off cells you do not want re-executed by Run All. |
+| `error: true` | Only affects rendering (Quarto continues past the exception). Interactively, Run All stops at the first error unless `qmdNotebook.execution.stopOnError` is off. |
+| `label` | Surfaced to agents with the cell, so "the `fig-stage-time` cell" resolves. |
+
+## The options worth knowing for analysis notebooks
+
+| Option | Effect when rendering |
+| --- | --- |
+| `label: fig-…` / `tbl-…` | Names the cell; `fig-`/`tbl-` prefixes make its figure or table cross-referenceable (`@fig-stage-time`). Must be unique in the document. |
+| `fig-cap: "…"`, `fig-alt: "…"` | Figure caption and alt text. `tbl-cap` for tables. |
+| `fig-subcap: [a, b]` + `layout-ncol: 2` | Several figures from one cell side by side, each captioned. |
+| `echo: false` | Hide the code, keep the output (plots, tables). |
+| `output: false` | Run the code, hide its output. `output: asis` treats printed text as Markdown. |
+| `include: false` | Run, but show neither code nor output (setup, data loading). |
+| `code-fold: true` | Collapse the code behind a disclosure; `code-summary: "…"` labels it. |
+| `warning: false` | Suppress warnings in the rendered output (you still see them in the notebook). |
+| `column: page` / `column: margin` | Wider or margin placement for a figure or table. |
+| `eval: false` | Show the code, never run it (in Quarto and in the notebook). |
+
+Not per-cell for Python: `fig-width`, `fig-height` and `fig-dpi` are **document-level** options
+for the Jupyter engine (put them in the front matter). Per figure, use Matplotlib's `figsize` and
+`dpi`; that is also what the notebook shows.
+
+## Document-level companions
+
+- `execute:` in the front matter sets defaults for every cell (`echo: false`, `warning: false`,
+  `eval: false`, and `freeze: auto` / `cache: true` to avoid re-running everything at render).
+- `jupyter: python3` (or a `kernelspec` block) names the kernel; QMD Notebook uses it to pre-select
+  the matching kernel in the picker.
+- Inline code in prose, `` `{python} f"{x:.0%}"` ``, renders only with Quarto; the notebook shows
+  it literally.
+
+## Agents and `#|` lines
+
+The `#|` header is part of the cell source agents read and write; the rules they are given say to
+keep it when editing a cell, and the parsed options (`label`, `fig-cap`, `eval`, …) are included
+in what they read, so a comment like "make the axis labels clearer" on a captioned figure keeps its
+label and caption intact. For Quarto's own option completion and validation, use **Edit in Source**
+(the Quarto extension provides it in the text editor).
+
+# 4. Troubleshooting
+
+- **Agent says the tools are unavailable**: the `.qmd` must be open as a QMD Notebook in the VS Code
+  window for this project; run the `doctor` command above; make sure `node` is on the agent's
+  `PATH`.
+- **No inline compose box**: select a kernel first.
+- **Codex reports a tool timeout about once a minute while watching**: its per-call limit is
+  still the default 60 s. Re-run the configure command, or put `tool_timeout_sec = 14700` under
+  `[mcp_servers.qmd_notebook]` in `~/.codex/config.toml` and add `--max-wait 4h` to the
+  companion's args.
+- **Problems to report**: set `qmdNotebook.logging.file` to a path (the log never contains cell
+  contents) and run **QMD Notebook: Copy Diagnostic Report**.
+- Known limitations: Pylance does not show diagnostics (squiggles) inside `.qmd` cells
+  (completion, hover and go-to-definition work); Remote SSH is designed for but not yet tested.
+  Details in `docs/research-decisions.md` and `docs/agent-setup.md`.

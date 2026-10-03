@@ -1,0 +1,4 @@
+interface:
+  display_name: "Focus Notebook"
+  short_description: "Handle comments in a live VS Code QMD notebook"
+  default_prompt: "Use $focus-notebook to watch the active QMD notebook and handle my comments."

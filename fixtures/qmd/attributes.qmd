@@ -1,0 +1,25 @@
+# Attributes
+
+```{python, echo=false}
+a = 1
+```
+
+```{python echo=false, eval=true}
+b = 2
+```
+
+```{python label="fig-x"}
+c = 3
+```
+
+```{.python}
+not_executable_class = True
+```
+
+``` {python}
+d = 4
+```
+
+```{python} 
+e = 5
+```

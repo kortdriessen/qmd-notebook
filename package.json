@@ -1,0 +1,30 @@
+{
+  "name": "qmd-notebook-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "QMD Notebook for VS Code: open Quarto .qmd files as native Python notebooks with a live agent bridge",
+  "license": "MIT",
+  "workspaces": [
+    "packages/shared",
+    "packages/vscode-extension",
+    "packages/mcp-server"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/shared && npm run build -w packages/mcp-server && npm run build -w packages/vscode-extension",
+    "test": "npm run test -w packages/shared && npm run test -w packages/vscode-extension && npm run test -w packages/mcp-server",
+    "test:vscode": "npm run test:vscode -w packages/vscode-extension",
+    "typecheck": "npm run typecheck -ws --if-present",
+    "lint": "eslint packages/*/src packages/*/test",
+    "format": "prettier --write \"packages/**/*.ts\" \"docs/**/*.md\"",
+    "package": "npm run package -w packages/vscode-extension"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "~5.9.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}

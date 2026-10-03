@@ -1,0 +1,12 @@
+# Strings
+
+```{python}
+doc = """
+```{python}
+nested text in string
+```
+"""
+print(doc)
+```
+
+After.

@@ -1,0 +1,10 @@
+# Unmatched
+
+```{python}
+x = 1
+
+Text continues without a closing fence.
+
+```{python}
+y = 2
+```

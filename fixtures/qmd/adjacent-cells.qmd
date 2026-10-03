@@ -1,0 +1,17 @@
+# Adjacent
+
+```{python}
+a = 1
+```
+```{python}
+b = 2
+```
+
+```{python}
+c = a + b
+```
+
+
+```{python}
+c
+```

@@ -1,0 +1,29 @@
+# Other engines
+
+```{r}
+x <- 1
+```
+
+```{julia}
+x = 1
+```
+
+```{bash}
+echo hi
+```
+
+```{ojs}
+x = 1
+```
+
+```python
+plain = "fence without braces"
+```
+
+```
+no info string
+```
+
+```{python}
+only_this = True
+```

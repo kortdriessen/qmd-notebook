@@ -1,0 +1,33 @@
+---
+title: "Callouts"
+---
+
+::: {.callout-note}
+This is a note.
+
+```{python}
+inside_callout = 1
+```
+:::
+
+::: {#fig-panel layout-ncol=2}
+
+```{python}
+#| label: fig-a
+1 + 1
+```
+
+```{python}
+#| label: fig-b
+2 + 2
+```
+
+Two panels.
+:::
+
+::: {.panel-tabset}
+## Tab A
+Content A
+## Tab B
+Content B
+:::

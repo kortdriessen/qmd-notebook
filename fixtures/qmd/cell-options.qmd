@@ -1,0 +1,26 @@
+---
+title: "Options"
+execute:
+  echo: false
+---
+
+```{python}
+#| label: setup
+#| eval: false
+#| fig-cap: "Not run"
+import time
+time.sleep(1000)
+```
+
+```{python}
+#| echo: false
+#| warning: false
+
+x = 1
+```
+
+```{python}
+# not an option comment
+#| eval: false
+y = 2
+```

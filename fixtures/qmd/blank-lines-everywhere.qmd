@@ -1,0 +1,23 @@
+
+
+
+# Leading blank lines above
+
+
+
+```{python}
+a = 1
+```
+
+
+
+```{python}
+b = 2
+```
+Text right after fence.
+```{python}
+c = 3
+```
+
+
+

@@ -1,0 +1,850 @@
+{
+  "name": "qmd-notebook",
+  "displayName": "QMD Notebook",
+  "description": "Open Quarto .qmd files as native Python notebooks: Pylance-backed cells, a persistent IPython kernel, lossless .qmd round-trips, and a live agent bridge for Claude Code and Codex.",
+  "version": "0.1.0",
+  "publisher": "kortdriessen",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kortdriessen/qmd-notebook"
+  },
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "categories": [
+    "Notebooks",
+    "Data Science",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "quarto",
+    "qmd",
+    "notebook",
+    "python",
+    "jupyter",
+    "mcp",
+    "claude",
+    "codex"
+  ],
+  "main": "./dist/extension.js",
+  "extensionKind": [
+    "workspace"
+  ],
+  "activationEvents": [
+    "onNotebook:qmd-notebook",
+    "workspaceContains:**/*.qmd"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "In untrusted workspaces QMD notebooks open read-only for execution: kernels cannot start and agents cannot modify cells."
+    },
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "Kernels need a real file system."
+    }
+  },
+  "contributes": {
+    "notebooks": [
+      {
+        "type": "qmd-notebook",
+        "displayName": "QMD Notebook",
+        "selector": [
+          {
+            "filenamePattern": "*.qmd"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      {
+        "command": "qmdNotebook.openAsNotebook",
+        "title": "Open as Notebook",
+        "category": "QMD Notebook",
+        "icon": "$(notebook)"
+      },
+      {
+        "command": "qmdNotebook.editInSource",
+        "title": "Edit in Source",
+        "category": "QMD Notebook",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "qmdNotebook.reopenAsNotebook",
+        "title": "Reopen as Notebook",
+        "category": "QMD Notebook",
+        "icon": "$(notebook)"
+      },
+      {
+        "command": "qmdNotebook.reloadFromDisk",
+        "title": "Reload from Disk",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.enterEditMode",
+        "title": "Enter Edit Mode",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.exitToNavigationMode",
+        "title": "Exit to Navigation Mode",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.nextCell",
+        "title": "Select Next Cell",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.previousCell",
+        "title": "Select Previous Cell",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.insertCellAbove",
+        "title": "Insert Python Cell Above",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.insertCellBelow",
+        "title": "Insert Python Cell Below",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.insertMarkdownCellAbove",
+        "title": "Insert Markdown Cell Above",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.insertMarkdownCellBelow",
+        "title": "Insert Markdown Cell Below",
+        "category": "QMD Notebook",
+        "icon": "$(markdown)"
+      },
+      {
+        "command": "qmdNotebook.convertToMarkdown",
+        "title": "Convert Cell to Markdown",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.convertToPython",
+        "title": "Convert Cell to Python",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.deleteCell",
+        "title": "Delete Cell",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.runCell",
+        "title": "Run Cell (Stay)",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.runCellAndAdvance",
+        "title": "Run Cell and Advance",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.runCellAndInsert",
+        "title": "Run Cell and Insert Below",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.forceRunCell",
+        "title": "Force Run Cell (ignore eval: false)",
+        "category": "QMD Notebook",
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "qmdNotebook.runCellsAbove",
+        "title": "Run Cells Above",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.runAll",
+        "title": "Run All Cells",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.selectKernel",
+        "title": "Select Kernel",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.interruptKernel",
+        "title": "Interrupt Kernel",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.restartKernel",
+        "title": "Restart Kernel",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.shutdownKernel",
+        "title": "Shut Down Kernel",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.clearCellOutputs",
+        "title": "Clear Cell Outputs",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.clearAllOutputs",
+        "title": "Clear All Outputs",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.askAgentAboutSelection",
+        "title": "Comment for Agent: Selection",
+        "category": "QMD Notebook",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "qmdNotebook.askAgentAboutCell",
+        "title": "Comment for Agent: Cell",
+        "category": "QMD Notebook",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "qmdNotebook.askAgentAboutOutput",
+        "title": "Comment for Agent: Output",
+        "category": "QMD Notebook",
+        "icon": "$(comment)"
+      },
+      {
+        "command": "qmdNotebook.focusAgent",
+        "title": "Focus Agent",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.startLiveClaude",
+        "title": "Start Live Claude Session",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.startLiveCodex",
+        "title": "Start Live Codex Session",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.sendRequestToLiveAgent",
+        "title": "Send Request to Live Agent",
+        "category": "QMD Notebook",
+        "icon": "$(send)"
+      },
+      {
+        "command": "qmdNotebook.agentConnectionStatus",
+        "title": "Agent Connection Status",
+        "category": "QMD Notebook",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "qmdNotebook.configureAgents",
+        "title": "Configure Claude Code / Codex MCP Access",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.copyMcpServerPath",
+        "title": "Copy MCP Server Path",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.copyDiagnosticReport",
+        "title": "Copy Diagnostic Report",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.applyRecommendedSettings",
+        "title": "Apply Recommended Appearance Settings",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.renderWithQuarto",
+        "title": "Render with Quarto",
+        "category": "QMD Notebook",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "qmdNotebook.showRequests",
+        "title": "Show Agent Requests",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.copyRequestToken",
+        "title": "Copy Request Handoff",
+        "category": "QMD Notebook",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "qmdNotebook.copyThreadAsMarkdown",
+        "title": "Copy Thread as Markdown",
+        "category": "QMD Notebook",
+        "icon": "$(markdown)"
+      },
+      {
+        "command": "qmdNotebook.insertThreadSummary",
+        "title": "Insert Thread Summary into Document",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.cancelRequest",
+        "title": "Cancel Request",
+        "category": "QMD Notebook",
+        "icon": "$(close)"
+      },
+      {
+        "command": "qmdNotebook.revealRequestCell",
+        "title": "Reveal Request Cell",
+        "category": "QMD Notebook",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "qmdNotebook.clearFinishedRequests",
+        "title": "Clear Finished Requests",
+        "category": "QMD Notebook",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "qmdNotebook.showOutputChannel",
+        "title": "Show Log",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.comments.resolve",
+        "title": "Close Agent Comment",
+        "category": "QMD Notebook",
+        "icon": "$(check)"
+      },
+      {
+        "command": "qmdNotebook.comments.reopen",
+        "title": "Reopen Agent Comment (ask again)",
+        "category": "QMD Notebook",
+        "icon": "$(debug-restart)"
+      },
+      {
+        "command": "qmdNotebook.comments.delete",
+        "title": "Delete Agent Comment Thread",
+        "category": "QMD Notebook",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "qmdNotebook.comments.reveal",
+        "title": "Show Agent Comments for Cell",
+        "category": "QMD Notebook"
+      },
+      {
+        "command": "qmdNotebook.releaseAgent",
+        "title": "Release Watching Agent",
+        "category": "QMD Notebook"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "qmdNotebook.nextCell",
+        "key": "j",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused && !notebookFindWidgetFocused && notebookType == 'qmd-notebook' && config.qmdNotebook.navigation.enableSingleLetterKeys"
+      },
+      {
+        "command": "qmdNotebook.previousCell",
+        "key": "k",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused && !notebookFindWidgetFocused && notebookType == 'qmd-notebook' && config.qmdNotebook.navigation.enableSingleLetterKeys"
+      },
+      {
+        "command": "qmdNotebook.insertCellAbove",
+        "key": "a",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused && !notebookFindWidgetFocused && notebookType == 'qmd-notebook' && notebookEditable && config.qmdNotebook.navigation.enableSingleLetterKeys"
+      },
+      {
+        "command": "qmdNotebook.insertCellBelow",
+        "key": "b",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused && !notebookFindWidgetFocused && notebookType == 'qmd-notebook' && notebookEditable && config.qmdNotebook.navigation.enableSingleLetterKeys"
+      },
+      {
+        "command": "qmdNotebook.convertToMarkdown",
+        "key": "m",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused && !notebookFindWidgetFocused && notebookType == 'qmd-notebook' && notebookEditable && config.qmdNotebook.navigation.enableSingleLetterKeys"
+      },
+      {
+        "command": "qmdNotebook.convertToPython",
+        "key": "y",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused && !notebookFindWidgetFocused && notebookType == 'qmd-notebook' && notebookEditable && config.qmdNotebook.navigation.enableSingleLetterKeys"
+      },
+      {
+        "command": "qmdNotebook.deleteCell",
+        "key": "d d",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused && !notebookFindWidgetFocused && notebookType == 'qmd-notebook' && notebookEditable && config.qmdNotebook.navigation.enableSingleLetterKeys"
+      },
+      {
+        "command": "qmdNotebook.enterEditMode",
+        "key": "enter",
+        "when": "notebookCellListFocused && !inputFocus && !notebookOutputInputFocused && !notebookFindWidgetFocused && notebookType == 'qmd-notebook' && notebookCellType == 'code'"
+      },
+      {
+        "command": "qmdNotebook.enterEditMode",
+        "key": "enter",
+        "when": "notebookCellListFocused && !inputFocus && !notebookOutputInputFocused && !notebookFindWidgetFocused && notebookType == 'qmd-notebook' && notebookCellType == 'markup' && !notebookCellMarkdownEditMode"
+      },
+      {
+        "command": "qmdNotebook.nextCell",
+        "key": "alt+j",
+        "when": "notebookEditorFocused && notebookType == 'qmd-notebook' && config.qmdNotebook.navigation.altJK"
+      },
+      {
+        "command": "qmdNotebook.previousCell",
+        "key": "alt+k",
+        "when": "notebookEditorFocused && notebookType == 'qmd-notebook' && config.qmdNotebook.navigation.altJK"
+      },
+      {
+        "command": "qmdNotebook.runCellAndAdvance",
+        "key": "shift+enter",
+        "when": "notebookEditorFocused && !notebookFindWidgetFocused && !notebookOutputInputFocused && notebookType == 'qmd-notebook' && notebookCellType == 'code'"
+      },
+      {
+        "command": "qmdNotebook.runCell",
+        "key": "ctrl+enter",
+        "when": "notebookEditorFocused && !notebookFindWidgetFocused && !notebookOutputInputFocused && notebookType == 'qmd-notebook' && notebookCellType == 'code'"
+      },
+      {
+        "command": "qmdNotebook.runCellAndInsert",
+        "key": "alt+enter",
+        "when": "notebookEditorFocused && !notebookFindWidgetFocused && !notebookOutputInputFocused && notebookType == 'qmd-notebook' && notebookCellType == 'code'"
+      },
+      {
+        "command": "qmdNotebook.askAgentAboutSelection",
+        "key": "ctrl+alt+a",
+        "when": "notebookEditorFocused && notebookType == 'qmd-notebook'"
+      },
+      {
+        "command": "qmdNotebook.askAgentAboutOutput",
+        "key": "ctrl+alt+o",
+        "when": "notebookEditorFocused && notebookType == 'qmd-notebook'"
+      },
+      {
+        "command": "qmdNotebook.editInSource",
+        "key": "ctrl+alt+s",
+        "when": "notebookEditorFocused && notebookType == 'qmd-notebook'"
+      },
+      {
+        "command": "qmdNotebook.reopenAsNotebook",
+        "key": "ctrl+alt+s",
+        "when": "editorTextFocus && resourceExtname == .qmd && !notebookEditorFocused"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "qmdNotebook.openAsNotebook",
+          "when": "resourceExtname == .qmd"
+        },
+        {
+          "command": "qmdNotebook.reopenAsNotebook",
+          "when": "resourceExtname == .qmd && !notebookEditorFocused"
+        },
+        {
+          "command": "qmdNotebook.editInSource",
+          "when": "notebookType == 'qmd-notebook'"
+        },
+        {
+          "command": "qmdNotebook.copyRequestToken",
+          "when": "false"
+        },
+        {
+          "command": "qmdNotebook.copyThreadAsMarkdown",
+          "when": "false"
+        },
+        {
+          "command": "qmdNotebook.insertThreadSummary",
+          "when": "false"
+        },
+        {
+          "command": "qmdNotebook.cancelRequest",
+          "when": "false"
+        },
+        {
+          "command": "qmdNotebook.revealRequestCell",
+          "when": "false"
+        },
+        {
+          "command": "qmdNotebook.forceRunCell",
+          "when": "notebookType == 'qmd-notebook'"
+        },
+        {
+          "command": "qmdNotebook.comments.resolve",
+          "when": "false"
+        },
+        {
+          "command": "qmdNotebook.comments.reopen",
+          "when": "false"
+        },
+        {
+          "command": "qmdNotebook.comments.delete",
+          "when": "false"
+        },
+        {
+          "command": "qmdNotebook.comments.reveal",
+          "when": "notebookType == 'qmd-notebook'"
+        },
+        {
+          "command": "qmdNotebook.releaseAgent",
+          "when": "notebookType == 'qmd-notebook'"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "qmdNotebook.editInSource",
+          "group": "navigation@1",
+          "when": "notebookType == 'qmd-notebook'"
+        },
+        {
+          "command": "qmdNotebook.renderWithQuarto",
+          "group": "navigation@2",
+          "when": "notebookType == 'qmd-notebook'"
+        },
+        {
+          "command": "qmdNotebook.reopenAsNotebook",
+          "group": "navigation@1",
+          "when": "resourceExtname == .qmd && !notebookType && activeEditor != 'workbench.editor.notebook'"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "qmdNotebook.openAsNotebook",
+          "when": "resourceExtname == .qmd"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "qmdNotebook.openAsNotebook",
+          "group": "navigation@9",
+          "when": "resourceExtname == .qmd"
+        }
+      ],
+      "notebook/toolbar": [
+        {
+          "command": "qmdNotebook.editInSource",
+          "group": "navigation/execute@9",
+          "when": "notebookType == 'qmd-notebook'"
+        },
+        {
+          "command": "qmdNotebook.agentConnectionStatus",
+          "group": "navigation/execute@10",
+          "when": "notebookType == 'qmd-notebook'"
+        },
+        {
+          "command": "qmdNotebook.insertMarkdownCellBelow",
+          "group": "navigation@3",
+          "when": "notebookType == 'qmd-notebook'"
+        }
+      ],
+      "notebook/cell/title": [
+        {
+          "command": "qmdNotebook.askAgentAboutCell",
+          "group": "inline@1",
+          "when": "notebookType == 'qmd-notebook'"
+        },
+        {
+          "command": "qmdNotebook.askAgentAboutOutput",
+          "group": "inline@2",
+          "when": "notebookType == 'qmd-notebook' && notebookCellHasOutputs"
+        },
+        {
+          "command": "qmdNotebook.forceRunCell",
+          "group": "inline@0",
+          "when": "notebookType == 'qmd-notebook' && notebookCellType == 'code'"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "qmdNotebook.agentConnectionStatus",
+          "group": "navigation@1",
+          "when": "view == qmdNotebook.requests"
+        },
+        {
+          "command": "qmdNotebook.clearFinishedRequests",
+          "group": "navigation@2",
+          "when": "view == qmdNotebook.requests"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "qmdNotebook.copyRequestToken",
+          "group": "inline@1",
+          "when": "view == qmdNotebook.requests && viewItem =~ /request/"
+        },
+        {
+          "command": "qmdNotebook.revealRequestCell",
+          "group": "inline@2",
+          "when": "view == qmdNotebook.requests && viewItem =~ /request/"
+        },
+        {
+          "command": "qmdNotebook.sendRequestToLiveAgent",
+          "group": "inline@3",
+          "when": "view == qmdNotebook.requests && viewItem =~ /request-pending/"
+        },
+        {
+          "command": "qmdNotebook.cancelRequest",
+          "group": "inline@4",
+          "when": "view == qmdNotebook.requests && viewItem =~ /request-pending/"
+        },
+        {
+          "command": "qmdNotebook.copyThreadAsMarkdown",
+          "group": "1_actions@1",
+          "when": "view == qmdNotebook.requests && viewItem =~ /request/"
+        },
+        {
+          "command": "qmdNotebook.insertThreadSummary",
+          "group": "1_actions@2",
+          "when": "view == qmdNotebook.requests && viewItem =~ /request/"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "qmdNotebook",
+          "title": "QMD Notebook",
+          "icon": "media/qmd-notebook.svg"
+        }
+      ]
+    },
+    "views": {
+      "qmdNotebook": [
+        {
+          "id": "qmdNotebook.requests",
+          "name": "Agent Requests",
+          "icon": "media/qmd-notebook.svg",
+          "contextualTitle": "QMD Notebook"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "qmdNotebook.requests",
+        "contents": "No agent requests yet.\nSelect text, a cell, or an output in a QMD notebook and run **Ask Agent About Selection / Cell / Output**.\n[Agent Connection Status](command:qmdNotebook.agentConnectionStatus)\n[Configure Claude Code / Codex](command:qmdNotebook.configureAgents)"
+      }
+    ],
+    "configuration": {
+      "title": "QMD Notebook",
+      "properties": {
+        "qmdNotebook.insertCellKind": {
+          "type": "string",
+          "enum": [
+            "python",
+            "markdown"
+          ],
+          "default": "python",
+          "description": "Kind of cell inserted by a/b and the insert commands."
+        },
+        "qmdNotebook.navigation.enableSingleLetterKeys": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable j/k/a/b/m/y/dd in navigation mode (cell list focused, no text input focused)."
+        },
+        "qmdNotebook.navigation.altJK": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Alt+J / Alt+K to select the next/previous cell from any mode. (Claude Code also binds Alt+K in text editors; inside QMD notebooks this setting takes precedence.)"
+        },
+        "qmdNotebook.navigation.showModeIndicator": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a QMD: NAV / QMD: EDIT indicator in the status bar."
+        },
+        "qmdNotebook.navigation.advanceOnError": {
+          "type": "boolean",
+          "default": false,
+          "description": "When Shift+Enter runs a cell that fails, still advance to the next cell (standard Jupyter behaviour). Default: stay on the failing cell."
+        },
+        "qmdNotebook.execution.backend": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "jupyter-client"
+          ],
+          "default": "auto",
+          "description": "Kernel backend. `jupyter-client` runs a small helper (python/qmd_kernel_host.py) inside the selected Python environment; it requires `ipykernel` in that environment."
+        },
+        "qmdNotebook.execution.retainKernelOnSourceSwitchSeconds": {
+          "type": "number",
+          "default": 600,
+          "minimum": 0,
+          "description": "Keep the kernel alive for this many seconds after the notebook is closed (e.g. while editing in source), so reopening reconnects to the same state."
+        },
+        "qmdNotebook.execution.stopOnError": {
+          "type": "boolean",
+          "default": true,
+          "description": "When running multiple cells, stop at the first error."
+        },
+        "qmdNotebook.execution.pythonCandidates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Extra Python interpreter paths to offer as kernels (in addition to environments discovered through the Python extension and registered Jupyter kernelspecs)."
+        },
+        "qmdNotebook.execution.startupTimeoutSeconds": {
+          "type": "number",
+          "default": 60,
+          "description": "Seconds to wait for a kernel to start before reporting a failure."
+        },
+        "qmdNotebook.outputs.persistAcrossReopen": {
+          "type": "boolean",
+          "default": false,
+          "description": "Reserved: restore stale-marked outputs when reopening a notebook. Not implemented in this version."
+        },
+        "qmdNotebook.outputs.cacheLimitMB": {
+          "type": "number",
+          "default": 250,
+          "description": "Reserved: size cap for the output cache."
+        },
+        "qmdNotebook.agent.enableBridge": {
+          "type": "boolean",
+          "default": true,
+          "description": "Start the local authenticated bridge that the qmd-notebook-mcp companion connects to."
+        },
+        "qmdNotebook.agent.preferredClient": {
+          "type": "string",
+          "enum": [
+            "claude",
+            "codex",
+            "none"
+          ],
+          "default": "claude",
+          "description": "Which agent surface Ask Agent focuses after creating a request."
+        },
+        "qmdNotebook.agent.installCodexSkill": {
+          "type": "boolean",
+          "default": true,
+          "scope": "machine",
+          "description": "Install or update the bundled $focus-notebook skill in ~/.agents/skills when QMD Notebook activates. Available to Codex across projects on this host; existing user-authored or customized skills are preserved. MCP access is configured separately through Configure Claude Code / Codex MCP Access."
+        },
+        "qmdNotebook.agent.contextNeighborCells": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Number of neighbouring cells (before and after) attached to a contextual request."
+        },
+        "qmdNotebook.agent.maxTextBytes": {
+          "type": "number",
+          "default": 200000,
+          "description": "Byte cap for text payloads returned to agents."
+        },
+        "qmdNotebook.agent.maxImageBytes": {
+          "type": "number",
+          "default": 5000000,
+          "description": "Byte cap for image payloads returned to agents."
+        },
+        "qmdNotebook.agent.claudeCommand": {
+          "type": "string",
+          "default": "claude",
+          "description": "Command used by Start Live Claude Session."
+        },
+        "qmdNotebook.agent.codexCommand": {
+          "type": "string",
+          "default": "codex",
+          "description": "Command used by Start Live Codex Session."
+        },
+        "qmdNotebook.logging.level": {
+          "type": "string",
+          "enum": [
+            "error",
+            "warn",
+            "info",
+            "debug",
+            "trace"
+          ],
+          "default": "info",
+          "description": "Verbosity of the QMD Notebook output channel. `trace` may log cell sources; other levels never log notebook content."
+        },
+        "qmdNotebook.logging.file": {
+          "type": "string",
+          "default": "",
+          "description": "Optional path of a file that also receives the QMD Notebook log (same content as the output channel). Useful when reporting problems."
+        }
+      }
+    },
+    "walkthroughs": [
+      {
+        "id": "qmdNotebook.gettingStarted",
+        "title": "Get started with QMD Notebook",
+        "description": "Open Quarto documents as Python notebooks and connect Claude Code or Codex.",
+        "steps": [
+          {
+            "id": "open",
+            "title": "Open a .qmd as a notebook",
+            "description": "Right-click a .qmd file \u2192 Open With \u2192 QMD Notebook. Executable ```{python} chunks become code cells; everything else stays Markdown.\n[Open Sample](command:qmdNotebook.openAsNotebook)",
+            "media": {
+              "markdown": "media/walkthrough-open.md"
+            }
+          },
+          {
+            "id": "kernel",
+            "title": "Select a Python kernel",
+            "description": "Use the kernel picker (top right) to choose an environment with ipykernel installed.\n[Select Kernel](command:qmdNotebook.selectKernel)",
+            "media": {
+              "markdown": "media/walkthrough-kernel.md"
+            }
+          },
+          {
+            "id": "navigate",
+            "title": "Navigate like a notebook",
+            "description": "Escape leaves a cell, Enter re-enters it. In navigation mode j/k move, a/b insert Python cells, m/y convert, d d deletes. Alt+J / Alt+K work from anywhere.",
+            "media": {
+              "markdown": "media/walkthrough-navigate.md"
+            }
+          },
+          {
+            "id": "agents",
+            "title": "Connect Claude Code or Codex",
+            "description": "Run **Configure Claude Code / Codex MCP Access** to register the qmd-notebook-mcp companion, then check **Agent Connection Status**.\n[Configure](command:qmdNotebook.configureAgents)\n[Status](command:qmdNotebook.agentConnectionStatus)",
+            "media": {
+              "markdown": "media/walkthrough-agents.md"
+            }
+          }
+        ]
+      }
+    ],
+    "notebookRenderer": [
+      {
+        "id": "qmd-notebook.comments",
+        "displayName": "QMD Notebook agent comments",
+        "entrypoint": "./dist/renderer.js",
+        "mimeTypes": [
+          "application/x-qmd-comment+json"
+        ],
+        "requiresMessaging": "optional"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "build:production": "node esbuild.mjs --production",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "compile-tests": "tsc -p tsconfig.test.json",
+    "test": "npm run compile-tests && node --test \"out/vscode-extension/test/unit/*.test.js\"",
+    "test:kernel": "npm run compile-tests && node --test \"out/vscode-extension/test/kernel/*.test.js\"",
+    "test:vscode": "npm run build && npm run compile-tests && node out/vscode-extension/test/runVsCodeTests.js",
+    "package": "npm run build:production && vsce package --no-dependencies -o ../../qmd-notebook.vsix"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@qmd-notebook/shared": "*",
+    "@types/mocha": "^10.0.10",
+    "@types/vscode": "1.125.0",
+    "@vscode/python-extension": "^1.0.6",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^3.9.0",
+    "mocha": "^11.0.0",
+    "zod": "^4.0.0"
+  }
+}

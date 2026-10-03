@@ -1,0 +1,17 @@
+# Indented
+
+1. A list item with a fence:
+
+   ```{python}
+   inside_list = 1
+   ```
+
+2. Another item.
+
+    ```{python}
+    four_spaces = 2
+    ```
+
+```{python}
+top = 3
+```

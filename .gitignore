@@ -1,0 +1,15 @@
+node_modules/
+dist/
+out/
+*.vsix
+*.tsbuildinfo
+.vscode-test/
+.DS_Store
+/tmp/
+/scratch/
+__pycache__/
+*.pyc
+/packages/vscode-extension/.vscode-test/
+/e2e-artifacts/
+
+/.quarto/

@@ -1,0 +1,12 @@
+---
+title: "CRLF"
+---
+
+# Windows
+
+```{python}
+x = 1
+y = 2
+```
+
+Text after.

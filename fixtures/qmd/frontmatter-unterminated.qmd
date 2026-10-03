@@ -1,0 +1,6 @@
+---
+title: "Broken"
+
+```{python}
+x = 1
+```

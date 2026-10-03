@@ -1,0 +1,10 @@
+---
+title: "Notes"
+---
+
+# Just notes
+
+No code here, only *Markdown* and a list:
+
+- one
+- two

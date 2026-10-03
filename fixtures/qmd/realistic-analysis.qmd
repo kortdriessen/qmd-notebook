@@ -1,0 +1,79 @@
+---
+title: "Sleep architecture across recording days"
+author: "K. Driessen"
+date: 2026-08-30
+format:
+  html:
+    toc: true
+    code-fold: true
+jupyter: python3
+execute:
+  warning: false
+---
+
+## Setup
+
+```{python}
+#| label: setup
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(0)
+```
+
+## Simulated hypnogram data
+
+We simulate a few days of sleep-stage bouts. Each row is one bout with a start time, a duration in seconds, and a stage label.
+
+```{python}
+#| label: simulate
+days = 3
+stages = ["Wake", "NREM", "REM"]
+rows = []
+for day in range(days):
+    t = 0.0
+    while t < 24 * 3600:
+        stage = rng.choice(stages, p=[0.4, 0.45, 0.15])
+        dur = float(rng.gamma(2.0, 300.0))
+        rows.append({"day": day, "start_s": t, "duration_s": dur, "stage": stage})
+        t += dur
+bouts = pd.DataFrame(rows)
+bouts.head()
+```
+
+::: {.callout-tip}
+The `bouts` dataframe is the only thing later cells depend on.
+:::
+
+## Time in each stage
+
+```{python}
+#| label: fig-stage-time
+#| fig-cap: "Total time per stage per day"
+summary = bouts.groupby(["day", "stage"])["duration_s"].sum().unstack() / 3600
+ax = summary.plot(kind="bar", figsize=(6, 3))
+ax.set_ylabel("hours")
+ax.set_xlabel("recording day")
+plt.tight_layout()
+```
+
+The REM fraction is expected to be roughly `{python} f"{summary['REM'].sum() / summary.sum().sum():.0%}"` overall.
+
+## Bout length distribution
+
+```{python}
+#| label: fig-bouts
+#| fig-cap: "Bout durations by stage"
+fig, axes = plt.subplots(1, 3, figsize=(9, 2.5), sharey=True)
+for ax, stage in zip(axes, stages):
+    ax.hist(bouts.loc[bouts.stage == stage, "duration_s"] / 60, bins=30)
+    ax.set_title(stage)
+    ax.set_xlabel("minutes")
+plt.tight_layout()
+```
+
+## Notes
+
+- `rng` is seeded, so the simulation is reproducible.
+- Real data would come from `load_hypnogram()`.

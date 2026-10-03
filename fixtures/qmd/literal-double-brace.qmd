@@ -1,0 +1,11 @@
+# Literal
+
+To show a cell in docs, write:
+
+```{{python}}
+print("shown, not run")
+```
+
+```{python}
+print("run")
+```

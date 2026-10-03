@@ -1,0 +1,19 @@
+# Tilde fences
+
+~~~{python}
+not_executed_by_quarto = True
+~~~
+
+~~~python
+plain = 1
+~~~
+
+```{python}
+real = 1
+```
+
+~~~~
+```{python}
+inside_tilde = 1
+```
+~~~~

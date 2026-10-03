@@ -1,0 +1,21 @@
+# Nested example
+
+Here is how you write a cell:
+
+````markdown
+```{python}
+print("this is documentation, not code")
+```
+````
+
+And a real one:
+
+```{python}
+print("real")
+```
+
+````
+```{python}
+also_not_real = True
+```
+````

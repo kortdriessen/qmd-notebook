@@ -1,0 +1,16 @@
+---
+title: "YAML"
+description: |
+  This front matter contains a fence:
+  ```{python}
+  print("not a cell")
+  ```
+jupyter:
+  kernelspec:
+    name: python3
+    display_name: Python 3
+---
+
+```{python}
+real = True
+```
