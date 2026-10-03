@@ -1,0 +1,67 @@
+name: Release
+
+# Push a tag such as v0.2.0 (matching packages/vscode-extension/package.json) to build the
+# extension and publish qmd-notebook-<version>.vsix as a GitHub Release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Check the tag matches the extension version
+        id: version
+        run: |
+          version=$(node -p "require('./packages/vscode-extension/package.json').version")
+          if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match extension version ${version}"
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+      - name: Package
+        run: |
+          scripts/package-vsix.sh
+          mv qmd-notebook.vsix "qmd-notebook-${{ steps.version.outputs.version }}.vsix"
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          awk -v v="${{ steps.version.outputs.version }}" '
+            /^## / { if (found) exit; if (index($0, "## " v " ") == 1 || $0 == "## " v) { found = 1; next } }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          {
+            echo
+            echo '## Install'
+            echo
+            echo '```bash'
+            echo "gh release download ${GITHUB_REF_NAME} -R ${GITHUB_REPOSITORY} -p '*.vsix'"
+            echo "code --install-extension qmd-notebook-${{ steps.version.outputs.version }}.vsix --force"
+            echo '```'
+          } >> release-notes.md
+          cat release-notes.md
+
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "qmd-notebook-${{ steps.version.outputs.version }}.vsix" \
+            --title "QMD Notebook ${{ steps.version.outputs.version }}" \
+            --notes-file release-notes.md

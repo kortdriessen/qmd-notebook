@@ -7,14 +7,31 @@ and inspect the same notebook and kernel you are looking at.
 
 The `.qmd` on disk stays clean Quarto Markdown: no `.ipynb` JSON, no outputs, no IDs.
 
-## Quick start
+## Install
+
+Each [GitHub Release](https://github.com/kortdriessen/qmd-notebook/releases) carries a
+self-contained `qmd-notebook-<version>.vsix` (the MCP companion is bundled). With the GitHub CLI
+logged in (`gh auth login`; the repository is private):
 
 ```bash
-# build + package (Node ≥ 20)
-npm install
-scripts/package-vsix.sh                      # → qmd-notebook.vsix
-code --install-extension qmd-notebook.vsix   # plus ms-python.python + ms-python.vscode-pylance
+gh release download -R kortdriessen/qmd-notebook -p '*.vsix'
+code --install-extension qmd-notebook-*.vsix --force   # plus ms-python.python + ms-python.vscode-pylance
 ```
+
+or, from a clone, `scripts/install-latest.sh [vX.Y.Z]`. Under Remote SSH run it in a terminal on
+the remote host (or use **Install in SSH: …** in the Extensions view). Then run **QMD Notebook:
+Configure Claude Code / Codex MCP Access** once per machine (step 5 below); the Python
+environments you use need `ipykernel`.
+
+To build from source instead (Node ≥ 20): `npm install && scripts/package-vsix.sh` → `qmd-notebook.vsix`.
+
+**Releasing:** bump the version (`npm version X.Y.Z --workspaces --include-workspace-root
+--no-git-tag-version`, plus `VERSION` in `packages/mcp-server/src/cli.ts`), move the CHANGELOG
+entries under `## X.Y.Z (date)`, commit, then `git tag vX.Y.Z && git push origin main vX.Y.Z`.
+The Release workflow tests, packages and publishes the `.vsix` with the changelog section as
+notes.
+
+## Quick start
 
 1. Right-click a `.qmd` → **Open With… → QMD Notebook**.
 2. Pick a kernel (any Python environment with `ipykernel`; you are offered an install if it is

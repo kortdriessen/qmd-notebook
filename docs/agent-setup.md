@@ -9,8 +9,8 @@ Codex CLI 0.149.1 / extension 26.5721, Linux.
 
 ## 1. Install the extension and the companion
 
-- Install `qmd-notebook.vsix` (`code --install-extension qmd-notebook.vsix`) plus the Python and
-  Pylance extensions. The Jupyter extension is **not** required (QMD Notebook runs its own
+- Install the `.vsix` from a GitHub Release (`code --install-extension
+  qmd-notebook-<version>.vsix`; see the README) plus the Python and Pylance extensions. The Jupyter extension is **not** required (QMD Notebook runs its own
   `jupyter_client` helper in the selected environment).
 - The companion is bundled inside the extension as `dist/qmd-notebook-mcp.js`; no separate
   install is needed. Optionally put it on your PATH for the short `qmd-notebook-mcp` form:

@@ -10,10 +10,9 @@ The `.qmd` on disk stays clean Quarto Markdown: no `.ipynb` JSON, no outputs, no
 ## Quick start
 
 ```bash
-# build + package (Node ≥ 20)
-npm install
-scripts/package-vsix.sh                      # → qmd-notebook.vsix
-code --install-extension qmd-notebook.vsix   # plus ms-python.python + ms-python.vscode-pylance
+# install a release (or build one: npm install && scripts/package-vsix.sh → qmd-notebook.vsix)
+gh release download -R kortdriessen/qmd-notebook -p '*.vsix'
+code --install-extension qmd-notebook-*.vsix --force   # plus ms-python.python + ms-python.vscode-pylance
 ```
 
 1. Right-click a `.qmd` → **Open With… → QMD Notebook**.

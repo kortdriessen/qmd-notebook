@@ -20,7 +20,16 @@ stays clean Quarto Markdown: no outputs, no ids, no agent chatter.
 - The agent you want to use, logged in: Claude Code CLI (`claude`) and/or Codex CLI (`codex`).
   The Claude Code / Codex VS Code extensions are optional (same capabilities, just a sidebar).
 
-## Build and install the extension
+## Install the extension
+
+From a GitHub Release (needs `gh auth login`; the repository is private):
+
+```bash
+gh release download -R kortdriessen/qmd-notebook -p '*.vsix'
+code --install-extension qmd-notebook-*.vsix --force   # then reload VS Code
+```
+
+or from a clone, `scripts/install-latest.sh` (latest release) or build it yourself:
 
 ```bash
 cd ~/vsCode_notebook_extension
@@ -31,7 +40,7 @@ code --install-extension qmd-notebook.vsix   # then reload VS Code
 
 The MCP companion (`qmd-notebook-mcp`) is bundled inside the extension as
 `dist/qmd-notebook-mcp.js`; nothing else to install. Find the installed path with
-`ls ~/.vscode/extensions | grep qmd-notebook` (currently `kortdriessen.qmd-notebook-0.1.0`).
+`ls ~/.vscode/extensions | grep qmd-notebook` (`kortdriessen.qmd-notebook-<version>`).
 
 ## Connect the agents (once, user level)
 
