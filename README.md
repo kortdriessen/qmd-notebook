@@ -25,6 +25,77 @@ environments you use need `ipykernel`.
 
 To build from source instead (Node ≥ 20): `npm install && scripts/package-vsix.sh` → `qmd-notebook.vsix`.
 
+### Setting up another machine (macOS)
+
+Everything QMD Notebook needs on a fresh Mac, from nothing to an agent handling notebook
+comments. (Development and testing so far were on Linux; the Mac path uses the same Unix-socket
+bridge.)
+
+1. **Tools.** With [Homebrew](https://brew.sh):
+
+   ```bash
+   brew install gh node uv     # GitHub CLI, Node ≥ 18 (runs the MCP companion), Python envs
+   gh auth login               # GitHub.com → SSH or HTTPS → log in with the browser
+   ```
+
+2. **VS Code** (1.125 or newer). Open it, then run **Shell Command: Install 'code' command in
+   PATH** from the Command Palette (`Cmd+Shift+P`) so `code` works in the terminal. Install the
+   Python extensions:
+
+   ```bash
+   code --install-extension ms-python.python
+   code --install-extension ms-python.vscode-pylance
+   ```
+
+3. **QMD Notebook** from the latest release:
+
+   ```bash
+   cd /tmp
+   gh release download -R kortdriessen/qmd-notebook -p '*.vsix' --clobber
+   code --install-extension qmd-notebook-*.vsix --force
+   ```
+
+   Reload any open VS Code windows (**Developer: Reload Window**). To update later, run the same
+   two commands again (or `scripts/install-latest.sh` from a clone of this repository).
+
+4. **A Python environment with `ipykernel`** for your notebooks, e.g. in a project folder:
+
+   ```bash
+   uv venv .venv && uv pip install ipykernel pandas matplotlib
+   ```
+
+   (Any conda/pyenv/venv environment works; the kernel picker offers to install `ipykernel` if it
+   is missing.)
+
+5. **Agents.** Install and log in to the Claude Code CLI (`claude`) and/or the Codex CLI
+   (`codex`), and check they are on your PATH in a new terminal. Then, in VS Code, run
+   **QMD Notebook: Configure Claude Code / Codex MCP Access** → **User level**. This registers the
+   `qmd-notebook` MCP server with both agents, appends the notebook rules to `~/.claude/CLAUDE.md`
+   and `~/.codex/AGENTS.md`, and installs `/focus-notebook` (Claude Code) and `$focus-notebook`
+   (Codex). Restart any running agent sessions afterwards. Run Configure after `brew install node`
+   so the registration points at the Homebrew `node`.
+
+6. **Check it.** Open a project folder in VS Code (trust it), right-click a `.qmd` → **Open With…
+   → QMD Notebook**, pick the `.venv` kernel and run a cell. Then, from a terminal in that
+   folder:
+
+   ```bash
+   node ~/Library/Application\ Support/Code/User/globalStorage/kortdriessen.qmd-notebook/qmd-notebook-mcp.js doctor --workspace .
+   claude mcp list    # should list qmd-notebook as connected
+   ```
+
+   **QMD Notebook: Agent Connection Status** shows the same from inside VS Code.
+
+7. **Use it.** Start `claude` (or `codex`) in the project folder, type
+   `/focus-notebook analysis.qmd` (Codex: `$focus-notebook analysis.qmd`), and comment on cells.
+   On a Mac the comment shortcuts are `Ctrl+Option+A` (selection or cell) and `Ctrl+Option+O`
+   (output); `Ctrl+Option+S` toggles **Edit in Source**. VS Code's `ctrl` means the Control key
+   on macOS, not Command.
+
+If the agent reports *No QMD Notebook bridge is active*, make sure the notebook's folder is the
+one open in VS Code (the agent must be started in that folder or a subfolder) and that the
+notebook is open as a QMD Notebook; `doctor` prints which discovery directories it searched.
+
 **Releasing:** bump the version (`npm version X.Y.Z --workspaces --include-workspace-root
 --no-git-tag-version`, plus `VERSION` in `packages/mcp-server/src/cli.ts`), move the CHANGELOG
 entries under `## X.Y.Z (date)`, commit, then `git tag vX.Y.Z && git push origin main vX.Y.Z`.
